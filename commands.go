@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8/internal"
@@ -1352,6 +1353,11 @@ func (c cmdable) RPop(ctx context.Context, key string) *StringCmd {
 	return cmd
 }
 
+func (c cmdable) RPopX(ctx context.Context, key string, count int) *StringSliceCmd {
+	cmd := NewStringSliceCmd(ctx, "rpop", key, strconv.Itoa(count))
+	_ = c(ctx, cmd)
+	return cmd
+}
 func (c cmdable) RPopLPush(ctx context.Context, source, destination string) *StringCmd {
 	cmd := NewStringCmd(ctx, "rpoplpush", source, destination)
 	_ = c(ctx, cmd)

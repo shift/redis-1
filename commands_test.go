@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/go-redis/redis/v8"
+	redis "github.com/go-redis/redis/v8"
 	"github.com/go-redis/redis/v8/internal/proto"
 )
 
@@ -2189,6 +2189,22 @@ var _ = Describe("Commands", func() {
 			lRange := client.LRange(ctx, "list", 0, -1)
 			Expect(lRange.Err()).NotTo(HaveOccurred())
 			Expect(lRange.Val()).To(Equal([]string{"one", "two"}))
+		})
+		It("should RPopX", func() {
+			rPush := client.RPush(ctx, "list", "one")
+			Expect(rPush.Err()).NotTo(HaveOccurred())
+			rPush = client.RPush(ctx, "list", "two")
+			Expect(rPush.Err()).NotTo(HaveOccurred())
+			rPush = client.RPush(ctx, "list", "three")
+			Expect(rPush.Err()).NotTo(HaveOccurred())
+
+			rPop := client.RPopX(ctx, "list", 2)
+			Expect(rPop.Err()).NotTo(HaveOccurred())
+			Expect(rPop.Val()).To(Equal([]string{"three", "two"}))
+
+			lRange := client.LRange(ctx, "list", 0, -1)
+			Expect(lRange.Err()).NotTo(HaveOccurred())
+			Expect(lRange.Val()).To(Equal([]string{"one"}))
 		})
 
 		It("should RPopLPush", func() {
